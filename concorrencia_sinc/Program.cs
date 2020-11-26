@@ -6,6 +6,10 @@ namespace concorrencia_sinc
 {
     class Program
     {
+        /*
+         Rodrigo Borges e José Braga
+         */
+
         //É possível definir um cliente ou mais de um para os threads realizarem as operações
         private static List<Client> clients = new List<Client>() {
             new Client(1, "Rodrigo", 2000)
@@ -22,15 +26,15 @@ namespace concorrencia_sinc
             for(int i = 0; i < nThreads; ++i)
             {
                 Client client = clients[new Random().Next(clients.Count)];
-                int operationToDo = new Random().Next(0, 3);
-                if (operationToDo == 0)
+                int operationToDo = new Random().Next(0, 10);
+                if (operationToDo % 2 == 0)
                 {
-                    threads[i] = new Thread(() => client.Loot(new Random().Next(1, 350)));
+                    threads[i] = new Thread(() => client.Loot(Util.RandomVal(1.0, 1000.0)));
                     threads[i].Start();
                 }
                 else if (operationToDo == 1)
                 {
-                    threads[i] = new Thread(() => client.Deposit(new Random().Next(1, 9999)));
+                    threads[i] = new Thread(() => client.Deposit(Util.RandomVal(1.0, 9999.9)));
                     threads[i].Start();
                 }
                 else

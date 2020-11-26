@@ -16,6 +16,7 @@ namespace concorrencia_sinc
         //Lista responsável por armazenar os IDs dos threads que solicitam o acesso a operação em questão
         private List<int> currentThreads = new List<int>();
 
+        private bool activeMutex = true;
         public Client(int id, string name, double money)
         {
             ID = id;
@@ -27,10 +28,13 @@ namespace concorrencia_sinc
         {
             try
             {
-                Util.ConsoleMessage(string.Format("Thread ({0}) quer sacar dinheiro! (ID Cliente: {1})", Thread.CurrentThread.ManagedThreadId, ID), ConsoleColor.Magenta);
-                currentThreads.Add(Thread.CurrentThread.ManagedThreadId);
-                mutex.WaitOne();
-                Util.ConsoleMessage(string.Format("Thread ({0}) agora pode sacar dinheiro! Quantidade solicitada: {1}", Thread.CurrentThread.ManagedThreadId, amount), ConsoleColor.Green);
+                if (activeMutex)
+                {
+                    Util.ConsoleMessage(string.Format("Thread ({0}) quer sacar dinheiro! (ID Cliente: {1})", Thread.CurrentThread.ManagedThreadId, ID), ConsoleColor.Magenta);
+                    currentThreads.Add(Thread.CurrentThread.ManagedThreadId);
+                    mutex.WaitOne();
+                    Util.ConsoleMessage(string.Format("Thread ({0}) agora pode sacar dinheiro! Quantidade solicitada: R$ {1}", Thread.CurrentThread.ManagedThreadId, amount.ToString("N2")), ConsoleColor.Green);
+                }
                 if ((Money - amount) >= 0)
                 {
                     Money -= amount;
@@ -42,9 +46,12 @@ namespace concorrencia_sinc
             }
             finally
             {
-                Util.ConsoleMessage(string.Format("Thread ({0}) finalizou o saque!", Thread.CurrentThread.ManagedThreadId), ConsoleColor.Blue);
-                currentThreads.Remove(Thread.CurrentThread.ManagedThreadId);
-                mutex.ReleaseMutex();
+                if (activeMutex)
+                {
+                    Util.ConsoleMessage(string.Format("Thread ({0}) finalizou o saque!", Thread.CurrentThread.ManagedThreadId), ConsoleColor.Blue);
+                    currentThreads.Remove(Thread.CurrentThread.ManagedThreadId);
+                    mutex.ReleaseMutex();
+                }
             }
 
         }
@@ -53,17 +60,23 @@ namespace concorrencia_sinc
         {
             try
             {
-                Util.ConsoleMessage(string.Format("Thread ({0}) quer depositar dinheiro! (ID Cliente: {1})", Thread.CurrentThread.ManagedThreadId, ID), ConsoleColor.Magenta);
-                currentThreads.Add(Thread.CurrentThread.ManagedThreadId);
-                mutex.WaitOne();
-                Util.ConsoleMessage(string.Format("Thread ({0}) agora pode depositar dinheiro! Quantidade depositada: {1}", Thread.CurrentThread.ManagedThreadId, amount), ConsoleColor.Green);
+                if (activeMutex)
+                {
+                    Util.ConsoleMessage(string.Format("Thread ({0}) quer depositar dinheiro! (ID Cliente: {1})", Thread.CurrentThread.ManagedThreadId, ID), ConsoleColor.Magenta);
+                    currentThreads.Add(Thread.CurrentThread.ManagedThreadId);
+                    mutex.WaitOne();
+                    Util.ConsoleMessage(string.Format("Thread ({0}) agora pode depositar dinheiro! Quantidade depositada: R$ {1}", Thread.CurrentThread.ManagedThreadId, amount.ToString("N2")), ConsoleColor.Green);
+                }
                 Money += amount;
             }
             finally
             {
-                Util.ConsoleMessage(string.Format("Thread ({0}) finalizou o depósito!", Thread.CurrentThread.ManagedThreadId), ConsoleColor.Blue);
-                currentThreads.Remove(Thread.CurrentThread.ManagedThreadId);
-                mutex.ReleaseMutex();
+                if (activeMutex)
+                {
+                    Util.ConsoleMessage(string.Format("Thread ({0}) finalizou o depósito!", Thread.CurrentThread.ManagedThreadId), ConsoleColor.Blue);
+                    currentThreads.Remove(Thread.CurrentThread.ManagedThreadId);
+                    mutex.ReleaseMutex();
+                }
             }
         }
 
@@ -71,35 +84,28 @@ namespace concorrencia_sinc
         {
             try
             {
-                Util.ConsoleMessage(string.Format("Thread ({0}) quer mostrar o saldo! (ID Cliente: {1})", Thread.CurrentThread.ManagedThreadId, ID), ConsoleColor.Magenta);
-                currentThreads.Add(Thread.CurrentThread.ManagedThreadId);
-                mutex.WaitOne();
-                Util.ConsoleMessage(string.Format("Thread ({0}) agora pode mostrar o saldo!", Thread.CurrentThread.ManagedThreadId), ConsoleColor.Green);
+                if (activeMutex)
+                {
+                    Util.ConsoleMessage(string.Format("Thread ({0}) quer mostrar o saldo! (ID Cliente: {1})", Thread.CurrentThread.ManagedThreadId, ID), ConsoleColor.Magenta);
+                    currentThreads.Add(Thread.CurrentThread.ManagedThreadId);
+                    mutex.WaitOne();
+                    Util.ConsoleMessage(string.Format("Thread ({0}) agora pode mostrar o saldo!", Thread.CurrentThread.ManagedThreadId), ConsoleColor.Green);
+                }
                 Console.WriteLine("###################################################################");
-                Console.WriteLine(string.Format("[{0}] - {1}", ID, Name));
+                Console.WriteLine(string.Format("[{0}] {1}", ID, Name));
                 Console.WriteLine("------------------");
-                Console.WriteLine("Saldo: " + Money);
+                Console.WriteLine("Saldo: R$ " + Money.ToString("N2"));
                 Console.WriteLine("###################################################################");
                 Console.WriteLine();
             }
             finally
             {
-                Util.ConsoleMessage(string.Format("Thread ({0}) finalizou a exibição do saldo!", Thread.CurrentThread.ManagedThreadId), ConsoleColor.Blue);
-                currentThreads.Remove(Thread.CurrentThread.ManagedThreadId);
-                mutex.ReleaseMutex();
-            }
-        }
-
-        public static void ShowClientsInfo(List<Client> clients)
-        {
-            foreach(Client client in clients)
-            {
-                Console.WriteLine("###################################################################");
-                Console.WriteLine(string.Format("[{0}] - {1}", client.ID, client.Name));
-                Console.WriteLine("------------------");
-                Console.WriteLine("Saldo: " + client.Money);
-                Console.WriteLine("###################################################################");
-                Console.WriteLine();
+                if (activeMutex)
+                {
+                    Util.ConsoleMessage(string.Format("Thread ({0}) finalizou a exibição do saldo!", Thread.CurrentThread.ManagedThreadId), ConsoleColor.Blue);
+                    currentThreads.Remove(Thread.CurrentThread.ManagedThreadId);
+                    mutex.ReleaseMutex();
+                }
             }
         }
     }

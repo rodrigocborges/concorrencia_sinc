@@ -18,5 +18,11 @@ namespace concorrencia_sinc
             Console.WriteLine(text);
             Console.ForegroundColor = ConsoleColor.Gray;
         }
+
+        public static double RandomVal(double min, double max)
+        {
+            double val = new Random().NextDouble() * (max - min) + min;
+            return val;
+        }
     }
 }
