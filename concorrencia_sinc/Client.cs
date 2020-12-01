@@ -24,6 +24,7 @@ namespace concorrencia_sinc
             Money = money;
         }
 
+        //Responsável pelo saque
         public void Loot(double amount)
         {
             try
@@ -56,6 +57,7 @@ namespace concorrencia_sinc
 
         }
 
+        //Responsável pelo saque
         public void Deposit(double amount)
         {
             try
@@ -80,6 +82,7 @@ namespace concorrencia_sinc
             }
         }
 
+        //Responsável por exibir o saldo
         public void ShowMoney() 
         {
             try

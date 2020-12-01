@@ -27,12 +27,12 @@ namespace concorrencia_sinc
             {
                 Client client = clients[new Random().Next(clients.Count)];
                 int operationToDo = new Random().Next(0, 10);
-                if (operationToDo % 2 == 0)
+                if (operationToDo > 0 && operationToDo <= 3)
                 {
                     threads[i] = new Thread(() => client.Loot(Util.RandomVal(1.0, 1000.0)));
                     threads[i].Start();
                 }
-                else if (operationToDo == 1)
+                else if (operationToDo > 3 && operationToDo <= 6)
                 {
                     threads[i] = new Thread(() => client.Deposit(Util.RandomVal(1.0, 9999.9)));
                     threads[i].Start();
